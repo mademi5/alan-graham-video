@@ -8,10 +8,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -26,7 +26,7 @@ jobs:
           ditto -c -k --sequesterRsrc --keepParent "Alan Graham Video Editor.app" "Alan-Graham-Video-Editor-macOS.zip"
 
       - name: Upload macOS package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Alan-Graham-Video-Editor-macOS
           path: dist/Alan-Graham-Video-Editor-macOS.zip
