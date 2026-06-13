@@ -1,0 +1,33 @@
+name: Build macOS App
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build .app
+        run: |
+          chmod +x build_mac.sh
+          ./build_mac.sh
+
+      - name: Zip for client delivery
+        run: |
+          cd dist
+          ditto -c -k --sequesterRsrc --keepParent "Alan Graham Video Editor.app" "Alan-Graham-Video-Editor-macOS.zip"
+
+      - name: Upload macOS package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Alan-Graham-Video-Editor-macOS
+          path: dist/Alan-Graham-Video-Editor-macOS.zip
+          retention-days: 30
