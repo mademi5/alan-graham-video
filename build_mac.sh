@@ -25,8 +25,11 @@ if command -v codesign >/dev/null 2>&1; then
   if [[ -f "$BIN" ]]; then
     codesign --force --sign - "$BIN" || true
   fi
-  codesign --force --deep --sign - "$APP_PATH" || true
+  codesign --force --sign - "$APP_PATH" || true
 fi
+
+echo "Clearing quarantine attribute (if present)..."
+xattr -cr "$APP_PATH" 2>/dev/null || true
 
 ZIP_PATH="dist/Alan-Graham-Video-Editor-macOS.zip"
 echo "Creating client zip: $ZIP_PATH"
@@ -38,4 +41,5 @@ echo "  App:  $APP_PATH"
 echo "  Zip:  $ZIP_PATH   (send this to the Mac client)"
 echo ""
 echo "Client: unzip, then double-click Alan Graham Video Editor.app"
+echo "If it does not open, run: chmod +x run_mac_debug.sh && ./run_mac_debug.sh"
 echo "If blocked: System Settings → Privacy & Security → Open Anyway"

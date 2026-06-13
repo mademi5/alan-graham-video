@@ -19,8 +19,8 @@ if (-not (Test-Path ".git")) {
 }
 
 git add .gitignore .github gui.py image_zoom_reveal.py brush_stroke_reveal.py `
-    requirements.txt build_requirements.txt build_mac.sh `
-    alan_graham_video_editor_mac.spec pyi_rth_ffmpeg.py publish_mac_build.ps1
+    requirements.txt build_requirements.txt build_mac.sh run_mac_debug.sh `
+    alan_graham_video_editor_mac.spec pyi_rth_ffmpeg.py pyi_rth_tkinter.py publish_mac_build.ps1
 
 git diff --cached --quiet
 if ($LASTEXITCODE -ne 0) {

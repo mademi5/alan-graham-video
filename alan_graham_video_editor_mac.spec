@@ -1,12 +1,30 @@
 # -*- mode: python ; coding: utf-8 -*-
 """PyInstaller spec — Alan Graham Video Editor (macOS .app bundle, onedir)."""
 
+import os
+import sys
+import sysconfig
+
 import imageio_ffmpeg
 from PyInstaller.utils.hooks import collect_submodules
 
 block_cipher = None
 
 ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
+
+
+def _tcl_tk_datas():
+    """Bundle Tcl/Tk scripts required by python.org macOS Python + tkinter."""
+    if sys.platform != "darwin":
+        return []
+    prefix = sysconfig.get_config_var("prefix") or sys.prefix
+    datas = []
+    for name in ("tcl8.6", "tk8.6"):
+        src = os.path.join(prefix, "lib", name)
+        if os.path.isdir(src):
+            datas.append((src, os.path.join("lib", name)))
+    return datas
+
 
 hidden = collect_submodules("moviepy") + collect_submodules("proglog")
 hidden += [
@@ -24,11 +42,11 @@ a = Analysis(
     ["gui.py"],
     pathex=[],
     binaries=[(ffmpeg_bin, ".")],
-    datas=[],
+    datas=_tcl_tk_datas(),
     hiddenimports=hidden,
     hookspath=[],
     hooksconfig={},
-    runtime_hooks=["pyi_rth_ffmpeg.py"],
+    runtime_hooks=["pyi_rth_tkinter.py", "pyi_rth_ffmpeg.py"],
     excludes=["matplotlib", "scipy", "pandas", "pytest", "tkinter.test"],
     cipher=block_cipher,
     noarchive=False,
