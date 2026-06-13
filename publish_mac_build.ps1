@@ -27,7 +27,10 @@ if ($LASTEXITCODE -ne 0) {
     git commit -m "Add macOS build workflow for Alan Graham Video Editor"
 }
 
-git remote remove origin 2>$null
+$remotes = @(git remote 2>$null)
+if ($remotes -contains "origin") {
+    git remote remove origin
+}
 git remote add origin $RepoUrl
 git push -u origin main --force
 
