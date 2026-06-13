@@ -2,11 +2,21 @@
 """PyInstaller spec — Alan Graham Video Editor."""
 
 import imageio_ffmpeg
-from PyInstaller.utils.hooks import collect_submodules
+from PyInstaller.utils.hooks import collect_submodules, copy_metadata
 
 block_cipher = None
 
 ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
+
+
+def _package_metadata():
+    datas = []
+    for pkg in ("imageio", "imageio-ffmpeg", "moviepy", "proglog", "decorator"):
+        try:
+            datas += copy_metadata(pkg)
+        except Exception:
+            pass
+    return datas
 
 hidden = collect_submodules("moviepy") + collect_submodules("proglog")
 hidden += [
@@ -24,7 +34,7 @@ a = Analysis(
     ["gui.py"],
     pathex=[],
     binaries=[(ffmpeg_bin, ".")],
-    datas=[],
+    datas=_package_metadata(),
     hiddenimports=hidden,
     hookspath=[],
     hooksconfig={},

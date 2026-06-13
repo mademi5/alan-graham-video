@@ -6,11 +6,22 @@ import sys
 import sysconfig
 
 import imageio_ffmpeg
-from PyInstaller.utils.hooks import collect_submodules
+from PyInstaller.utils.hooks import collect_submodules, copy_metadata
 
 block_cipher = None
 
 ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
+
+
+def _package_metadata():
+    """Wheel metadata required by imageio/moviepy at import time."""
+    datas = []
+    for pkg in ("imageio", "imageio-ffmpeg", "moviepy", "proglog", "decorator"):
+        try:
+            datas += copy_metadata(pkg)
+        except Exception:
+            pass
+    return datas
 
 
 def _tcl_tk_datas():
@@ -42,7 +53,7 @@ a = Analysis(
     ["gui.py"],
     pathex=[],
     binaries=[(ffmpeg_bin, ".")],
-    datas=_tcl_tk_datas(),
+    datas=_tcl_tk_datas() + _package_metadata(),
     hiddenimports=hidden,
     hookspath=[],
     hooksconfig={},
