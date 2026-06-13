@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller spec — Alan Graham Video Editor (macOS .app bundle)."""
+"""PyInstaller spec — Alan Graham Video Editor (macOS .app bundle, onedir)."""
 
 import imageio_ffmpeg
 from PyInstaller.utils.hooks import collect_submodules
@@ -39,10 +39,8 @@ pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
     [],
+    exclude_binaries=True,
     name="Alan Graham Video Editor",
     debug=False,
     bootloader_ignore_signals=False,
@@ -58,8 +56,19 @@ exe = EXE(
     entitlements_file=None,
 )
 
-app = BUNDLE(
+coll = COLLECT(
     exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=False,
+    upx_exclude=[],
+    name="Alan Graham Video Editor",
+)
+
+app = BUNDLE(
+    coll,
     name="Alan Graham Video Editor.app",
     icon=None,
     bundle_identifier="com.alangraham.videoeditor",
@@ -68,6 +77,7 @@ app = BUNDLE(
         "CFBundleDisplayName": "Alan Graham Video Editor",
         "CFBundleShortVersionString": "1.0.0",
         "CFBundleVersion": "1.0.0",
+        "LSMinimumSystemVersion": "10.13",
         "NSHighResolutionCapable": True,
         "NSRequiresAquaSystemAppearance": False,
     },

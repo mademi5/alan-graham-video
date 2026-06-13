@@ -21,6 +21,10 @@ fi
 # Ad-hoc sign so Gatekeeper is less likely to block local runs (optional).
 if command -v codesign >/dev/null 2>&1; then
   echo "Applying ad-hoc code signature..."
+  BIN="$APP_PATH/Contents/MacOS/Alan Graham Video Editor"
+  if [[ -f "$BIN" ]]; then
+    codesign --force --sign - "$BIN" || true
+  fi
   codesign --force --deep --sign - "$APP_PATH" || true
 fi
 
