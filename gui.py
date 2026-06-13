@@ -9,6 +9,7 @@ Run:
 from __future__ import annotations
 
 import os
+import sys
 import threading
 import tkinter as tk
 from pathlib import Path
@@ -30,6 +31,29 @@ from image_zoom_reveal import (
 APP_NAME = "Alan Graham Video Editor"
 PREVIEW_MAX_W = 520
 PREVIEW_MAX_H = 360
+
+
+def _image_filetypes() -> list[tuple[str, str]]:
+    # macOS Tk crashes on semicolon-separated patterns (setAllowedFileTypes).
+    if sys.platform == "darwin":
+        return [
+            ("PNG", "*.png"),
+            ("JPEG", "*.jpg"),
+            ("JPEG", "*.jpeg"),
+            ("WebP", "*.webp"),
+            ("Bitmap", "*.bmp"),
+            ("All files", "*"),
+        ]
+    return [
+        ("Image files", "*.png;*.jpg;*.jpeg;*.webp;*.bmp"),
+        ("All files", "*.*"),
+    ]
+
+
+def _video_filetypes() -> list[tuple[str, str]]:
+    if sys.platform == "darwin":
+        return [("MP4 video", "*.mp4")]
+    return [("MP4 video", "*.mp4")]
 
 
 class AlanGrahamVideoEditorApp(tk.Tk):
@@ -304,10 +328,7 @@ class AlanGrahamVideoEditorApp(tk.Tk):
     def _pick_input(self) -> None:
         path = filedialog.askopenfilename(
             title="Select Image",
-            filetypes=[
-                ("Image files", "*.png;*.jpg;*.jpeg;*.webp;*.bmp"),
-                ("All files", "*.*"),
-            ],
+            filetypes=_image_filetypes(),
         )
         if not path:
             return
@@ -322,7 +343,7 @@ class AlanGrahamVideoEditorApp(tk.Tk):
         path = filedialog.asksaveasfilename(
             title="Save Video",
             defaultextension=".mp4",
-            filetypes=[("MP4 video", "*.mp4")],
+            filetypes=_video_filetypes(),
             initialfile=Path(self.output_path.get()).name,
         )
         if path:
