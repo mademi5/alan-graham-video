@@ -32,6 +32,17 @@ APP_NAME = "Alan Graham Video Editor"
 PREVIEW_MAX_W = 520
 PREVIEW_MAX_H = 360
 
+DEFAULT_DURATION = 10.0
+DEFAULT_ZOOM_END = 7.0
+DEFAULT_HOLD_END = 3.0
+DEFAULT_FPS = 30
+DEFAULT_REVEAL_MODE = "crop-reveal"
+DEFAULT_CHIP_WIDTH_PCT = 12.0
+DEFAULT_CHIP_HEIGHT_PCT = 12.0
+DEFAULT_CHIP_ANCHOR = "center"
+DEFAULT_RADIAL_START_PCT = 8.0
+DEFAULT_BRUSH_STROKE_COUNT = 420
+
 
 def _image_filetypes() -> list[tuple[str, str]]:
     # macOS Tk crashes on semicolon-separated patterns (setAllowedFileTypes).
@@ -66,16 +77,16 @@ class AlanGrahamVideoEditorApp(tk.Tk):
 
         self.input_path = tk.StringVar()
         self.output_path = tk.StringVar(value=str(Path.cwd() / "output.mp4"))
-        self.duration = tk.DoubleVar(value=10.0)
-        self.zoom_end = tk.DoubleVar(value=7.0)
-        self.hold_end = tk.DoubleVar(value=3.0)
-        self.fps = tk.IntVar(value=30)
-        self.reveal_mode = tk.StringVar(value="crop-reveal")
-        self.chip_width_pct = tk.DoubleVar(value=12.0)
-        self.chip_height_pct = tk.DoubleVar(value=12.0)
-        self.chip_anchor = tk.StringVar(value="center")
-        self.radial_start_pct = tk.DoubleVar(value=8.0)
-        self.brush_stroke_count = tk.IntVar(value=420)
+        self.duration = tk.DoubleVar(value=DEFAULT_DURATION)
+        self.zoom_end = tk.DoubleVar(value=DEFAULT_ZOOM_END)
+        self.hold_end = tk.DoubleVar(value=DEFAULT_HOLD_END)
+        self.fps = tk.IntVar(value=DEFAULT_FPS)
+        self.reveal_mode = tk.StringVar(value=DEFAULT_REVEAL_MODE)
+        self.chip_width_pct = tk.DoubleVar(value=DEFAULT_CHIP_WIDTH_PCT)
+        self.chip_height_pct = tk.DoubleVar(value=DEFAULT_CHIP_HEIGHT_PCT)
+        self.chip_anchor = tk.StringVar(value=DEFAULT_CHIP_ANCHOR)
+        self.radial_start_pct = tk.DoubleVar(value=DEFAULT_RADIAL_START_PCT)
+        self.brush_stroke_count = tk.IntVar(value=DEFAULT_BRUSH_STROKE_COUNT)
         self.status_text = tk.StringVar(value="Select an image and create your video.")
         self.progress = tk.DoubleVar(value=0.0)
 
@@ -266,6 +277,9 @@ class AlanGrahamVideoEditorApp(tk.Tk):
             state="readonly",
             width=20,
         ).pack(side="left", padx=8)
+        ttk.Button(mode_row, text="Reset Settings", command=self._reset_settings).pack(
+            side="left", padx=(4, 0)
+        )
         self.reveal_mode.trace_add("write", lambda *_: self._update_mode_ui())
 
         out_row = ttk.Frame(settings)
@@ -324,6 +338,28 @@ class AlanGrahamVideoEditorApp(tk.Tk):
             self.brush_label.grid()
             self.brush_count_spin.grid()
         self._refresh_preview()
+
+    def _reset_settings(self) -> None:
+        if self._busy:
+            return
+
+        self.duration.set(DEFAULT_DURATION)
+        self.zoom_end.set(DEFAULT_ZOOM_END)
+        self.hold_end.set(DEFAULT_HOLD_END)
+        self.fps.set(DEFAULT_FPS)
+        self.chip_width_pct.set(DEFAULT_CHIP_WIDTH_PCT)
+        self.chip_height_pct.set(DEFAULT_CHIP_HEIGHT_PCT)
+        self.chip_anchor.set(DEFAULT_CHIP_ANCHOR)
+        self.radial_start_pct.set(DEFAULT_RADIAL_START_PCT)
+        self.brush_stroke_count.set(DEFAULT_BRUSH_STROKE_COUNT)
+        self.reveal_mode.set(DEFAULT_REVEAL_MODE)
+
+        if self._source_image is not None:
+            w, h = self._source_image.size
+            self._set_light_position(w // 2, h // 2, update_vars=True)
+
+        self._update_mode_ui()
+        self.status_text.set("Settings reset to defaults.")
 
     def _pick_input(self) -> None:
         path = filedialog.askopenfilename(
